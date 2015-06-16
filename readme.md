@@ -9,13 +9,20 @@ The preferred habitat is Linux, but it should work on OS X and Windows too.
 Usage:
 
 owonread OPTION filename
+
    Options: 
+   
    -t type: type for data - image | track | screen | file
+   
    -c selection: select channel 1/2/3/4 for track data, 
                  jpg/bmp/png for image, file name for file
+                 
    -s # : skip the first # byte from the scope
+   
    -i ip_addr: IP-Address of the oscilloscope
+   
    -p port : port number - default 3000
+   
    -h print these few help lines
 
 If the file name is missing or '-', the data is written to stdout
