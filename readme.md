@@ -30,7 +30,7 @@ If the file name is missing or '-', the data is written to stdout
 Default: image = BMP, skip = 0, ip_addr = 'owon.tds', port = 3000, selection = 1/BMP
 
 Reading the file system is pretty basic. If with option -t f no file name is
-given in option -c, the to level directory is displayed. If a file name is
+given in option -c, the top level directory is displayed. If a file name is
 give in option -c, this file is read.
 
 It's work in progress. Open tasks: 
