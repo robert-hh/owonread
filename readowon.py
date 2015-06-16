@@ -7,13 +7,14 @@ import sys
 import socket
 import getopt
 
-def read_data(cmd_txt, server_addr, fname, skip):
+def read_data(cmd_txt, parm,  server_addr, fname, skip):
     try:
         s = socket.socket()
         s.connect(server_addr)
         if s:
 # send command
-            cmd = struct.pack("<l%ds" % len(cmd_txt), len(cmd_txt), cmd_txt.encode())
+            cmd = cmd_txt + parm
+            cmd = struct.pack("<l%ds" % len(cmd), len(cmd), cmd.encode())
             s.send(cmd)
 # get length of response
             ss = s.recv(4)
@@ -35,7 +36,10 @@ def read_data(cmd_txt, server_addr, fname, skip):
             nrecv = 0
             while nrecv < size:
                 img = s.recv(size - nrecv)
-                f.buffer.write(img)
+                if f == sys.stdout:
+                    f.buffer.write(img)
+                else:
+                    f.write(img)
                 nrecv += len(img)
 # and that's it
             if f != sys.stdout:
@@ -50,13 +54,13 @@ def usage():
     print ("readowon OPTION filename\n" \
             "   Options: \n"\
             "   -t type: type for data - image | track | screen\n" \
-            "   -c channel: select channel for track data\n" \
+            "   -c selection: select channel 1/2/3/4 for track data, jpg/bmp/png for image\n" \
             "   -s # : skip the first # byte from the scope\n" \
             "   -i ip_addr: IP-Address of the oscilloscope\n" \
             "   -p port : port number - default 3000\n" \
             "   -h print these few help lines\n" \
             "If the file name is missing or '-', the data is written to stdout\n"\
-            "Default: image, skip = 0")
+            "Default: image = BMP, skip = 0, ip_addr = 'owon.tds', port = 3000, selection = 1/BMP")
 
 
 def main():
@@ -83,16 +87,19 @@ def main():
 
     skip = int(args_dict['-s'])
     dtype = args_dict['-t'][0].lower()
-    channel=args_dict['-c'][0]
     port = int(args_dict['-p'])
     ipaddr = args_dict['-i']
 
     if dtype == 'i':  # read image
-        read_data("IMAGE", (ipaddr, port), fname, skip)
+        if args_dict['-c'].upper() in ("BMP", "JPG", "PNG"):
+            read_data("IMAGE", args_dict['-c'].upper(), (ipaddr, port), fname, skip)
+        else:
+            read_data("IMAGE", "", (ipaddr, port), fname, skip)
     elif dtype == 's': # read actual screen content, to be decoded. Header size is 278 bytes
-        read_data("CUTDATA", (ipaddr, port), fname, skip)
+        read_data("CUTDATA", "", (ipaddr, port), fname, skip)
     elif dtype == 't': # read full track data, to be decoded. Header size is 74 bytes before the raw data
-        read_data("FULLDATACH" + channel + '\x7c', (ipaddr, port), fname, skip)
+        channel=args_dict['-c'][0]
+        read_data("FULLDATA", "CH" + channel, (ipaddr, port), fname, skip)
     else:
         sys.stderr.write ("Unkown data type: %s \n" % args_dict['-t'])
 
