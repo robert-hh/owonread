@@ -1,5 +1,5 @@
 
-# Owonread: Reading data from the Owon DTS Series oscilloscopes
+# Owonread: Reading data from the Owon TDS Series oscilloscopes
 
 This is small Python3 script to read the bitmap image, binary image and the 
 full track data from an OWON TDS-Model oscilloscope using LAN. 
