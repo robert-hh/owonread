@@ -10,7 +10,7 @@ but it should work on OS X and Windows too, since no OS-specific syntax is used.
 
 **Usage**
 ```
-owonread [OPTIONS] [source] [target]
+python3 owonread.py [OPTIONS] [source] [target]
 
 Options:
    -t type: data type, as of: bmp jpg png ch1 ch2 ch3 ch4 screen dir file
@@ -25,32 +25,35 @@ Options:
    -i ip_addr: IP-Address of the oscilloscope
    -p port : port number, default 3000
    -h print these few help lines
-   
-If the target file name is missing or '-', the data is written to stdout
-Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon.tds', port = 3000
-```
+```   
+If the target file name is missing or '-', the data is written to stdout<br>
+Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon.tds', port = 3000<br>
+
+The script contains a shebang line, so you can start it without typing python3 upfront, if you tag is as executable. 
+On your system, python3 may be python. 
+
 
 **Examples:**
 
-`owonread image001.bmp`<br>
+`python3 owonread.py image001.bmp`<br>
     *get the screen image as BMP file and store it into image001.bmp*
 
-`owonread -t jpg image002.jpg`<br>
+`python3 owonread.py -t jpg image002.jpg`<br>
     *get the screen image as BMP file*
 
-`owonread -t ch1 fulldata.bin`<br>
+`python3 owonread.py -t ch1 fulldata.bin`<br>
     *get the full content of CH1 data buffer*
 
-`owonread -t ch3 -s 78 rawdata.bin`<br>
+`python3 owonread.py -t ch3 -s 78 rawdata.bin`<br>
     *get the full content of CH3 track buffer, skipping the first 78 bytes with header information*
     
-`owonread -t dir`<br>
+`python3 owonread.py -t dir`<br>
     *Show the list of files stored in the data section of the oscillscope* 
 
-`owonread -t file /D/owon00001.csv pulse_response.csv`<br>
+`python3 owonread.py -t file /D/owon00001.csv pulse_response.csv`<br>
     *read the file owon0001.csv from the device and store it as pulse_response.csv*
 
-`owonread | display`<br>
+`python3 owonread.py | display`<br>
     *get the actual screen image and pipe it into the Linux display command*
             
 **Notes**
