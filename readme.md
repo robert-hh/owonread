@@ -26,9 +26,9 @@ Options:
    -p port : port number, default 3000
    -h print these few help lines
    
-If the target file name is missing or '-', the data is written to stdout<br>
-Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon-tds', port = 3000<br>
-
+If the target file name is missing or '-', the data is written to stdout
+Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon-tds', port = 3000
+```
 The script contains a shebang line, so you can start it without typing python3 upfront, if it is tagges as executable. On your system, python3 may be python. 
 
 
