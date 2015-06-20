@@ -14,23 +14,22 @@ python3 owonread.py [OPTIONS] [source] [target]
 
 Options:
    -t type: data type, as of: bmp jpg png ch1 ch2 ch3 ch4 screen dir file
-      types bmp jpg png get the screen picture
-      types ch1 ch2 ch3 ch4 get the deep trach data of that channel
+      type bmp, jpg and png get the screen image in the respective format
+      type ch1, ch2, ch3 and ch4 get the deep track data of that channel
       type screen gets the binary screen content
-      type dir shows the content of the devices file store
-      type files get a file. The full path name as shown with dir must
-         be supplied. 
+      type dir shows the content of the devices file storage
+      type file gets a file. The full path name as shown with the 
+          command dir must be supplied. 
    -s # : skip the first # bytes of the data from the device
    -g # : get the following # bytes of the data from the device
    -i ip_addr: IP-Address of the oscilloscope
    -p port : port number, default 3000
    -h print these few help lines
-```   
+   
 If the target file name is missing or '-', the data is written to stdout<br>
-Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon.tds', port = 3000<br>
+Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon-tds', port = 3000<br>
 
-The script contains a shebang line, so you can start it without typing python3 upfront, if you tag is as executable. 
-On your system, python3 may be python. 
+The script contains a shebang line, so you can start it without typing python3 upfront, if it is tagges as executable. On your system, python3 may be python. 
 
 
 **Examples:**
