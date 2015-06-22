@@ -48,8 +48,8 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
             name = s.recv(hdr_size) 
             size -= hdr_size
 # open file, if required
-            if fname != "":
-                if fname != "-":
+            if fname != None:
+                if fname:
                     f = open(fname, "wb")
                 else:
                     f = stdout
@@ -65,7 +65,7 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
 # get bulk data
             while size > 0:
                 img = s.recv(size)
-                if fname != "":
+                if fname != None:
                     if f == stdout:
                         f.buffer.write(img)
                     else:
@@ -78,7 +78,7 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
                 img = s.recv(skip)
                 skip -= len(img)
 # and that's it
-            if fname != "" and fname != "-":
+            if fname:
                 f.close()
             s.close()
             return res
@@ -88,7 +88,7 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
 
 # Print a directory file
 def print_dir(d, recurse, server_addr):
-    s = read_data("INNERFILE", d, server_addr, "", 0, 0)
+    s = read_data("INNERFILE", d, server_addr, None, 0, 0)
     if s:
         pos = 0
         while pos < len(s):
@@ -140,7 +140,9 @@ Options:
       type bmp, jpg and png get the screen image in the respective format
       type ch1, ch2, ch3 and ch4 get the deep track data of that channel
       type screen gets the binary screen content
-      type dir shows the content of the devices file storage
+      type dir shows the content of the devices file storage. If the optional 
+           parameter source is 'all', the files on an USB drive a displayed as 
+           well
       type file gets a file. The full path name as shown with the 
           command dir must be supplied. 
    -s # : skip the first # bytes of the data from the device
@@ -178,7 +180,7 @@ def main():
     if len(args) > 0:  # additional argument present?
         fname = args[0] # first guess: that is the target filename
     else:
-        fname = "-"
+        fname = ""
 
     dtype = args_dict['-t'].upper() # change to uppercase
     skip = int(args_dict['-s'])
@@ -197,17 +199,21 @@ def main():
         read_data("FULLDATA", dtype, (ipaddr, port), fname, skip, get)
     elif dtype[0] == 'D': 
 # read Directory
+        if fname.lower() == "all":
+            fname = ""
+        else: 
+            fname = "/D"
         print("\nDirectory of Files:");
-        print_dir("/D", True, (ipaddr, port))
+        print_dir(fname, True, (ipaddr, port))
         print("")
     elif dtype[0] == 'F': 
 # read file from scope. In that case, there must be at least one, and may be a second filename given
-        if fname != "-":
+        if fname != "":
             dtype = fname
             if len(args) > 1:  # additional argument present?
                 fname = args[1] # that must be the target filename
             else:
-                fname = "-"
+                fname = ""
             read_data("INNERFILE", dtype, (ipaddr, port), fname, 0, 0)
         else:
             stderr.write("Error: Source file name missing\n")

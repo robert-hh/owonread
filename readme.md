@@ -6,7 +6,7 @@
 This is small Python3 script to read the screen image, binary images, the 
 full track data and files from an OWON TDS-Model oscilloscope using LAN. 
 It's quick and dirty, but seems to work.  The preferred habitat is Linux, 
-but it should work on OS X and Windows too, since no OS-specific syntax is used.
+but it works as well on OS X and Windows.
 
 **Usage**
 ```
@@ -17,7 +17,9 @@ Options:
       type bmp, jpg and png get the screen image in the respective format
       type ch1, ch2, ch3 and ch4 get the deep track data of that channel
       type screen gets the binary screen content
-      type dir shows the content of the devices file storage
+      type dir shows the content of the devices file storage. If the optional 
+           parameter source is 'all', the files on an USB drive a displayed as 
+           well
       type file gets a file. The full path name as shown with the 
           command dir must be supplied. 
    -s # : skip the first # bytes of the data from the device
@@ -25,11 +27,11 @@ Options:
    -i ip_addr: IP-Address of the oscilloscope
    -p port : port number, default 3000
    -h print these few help lines
-   
-If the target file name is missing or '-', the data is written to stdout
+
+If the target file name is missing, the data is written to stdout
 Defaults: type = bmp, skip = 0, get = all, ip_addr = 'owon-tds', port = 3000
 ```
-The script contains a shebang line, so you can start it without typing python3 upfront, if it is tagges as executable. On your system, python3 may be python. 
+The script contains a shebang line, so you can start it without typing python3 upfront, if it is tagged as executable. On your system, python3 may be python. 
 
 
 **Examples:**
@@ -49,6 +51,9 @@ The script contains a shebang line, so you can start it without typing python3 u
 `python3 owonread.py -t dir`<br>
     *Show the list of files stored in the data section of the oscillscope* 
 
+`python3 owonread.py -t dir all`<br>
+    *Show the list of files stored in the data section of the oscillscope and in the attached USB drive* 
+
 `python3 owonread.py -t file /D/owon00001.csv pulse_response.csv`<br>
     *read the file owon0001.csv from the device and store it as pulse_response.csv*
 
@@ -57,7 +62,5 @@ The script contains a shebang line, so you can start it without typing python3 u
             
 **Notes**
  
-- It's work in progress. Open task: Decode the header coming with full track, allowing to send it to e.g. gnuplot. 
-Owon provided some information about the header structure, but it does not fit yet properly.
-- The skip and get options are obviously obsolete, since you could do the same with the Linux **head** command.
+- Directories can be read as a file, using the file data type and the name of the directory as the source.
 
