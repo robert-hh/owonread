@@ -28,6 +28,7 @@ from getopt import getopt
 from struct import pack, unpack
 from binascii import unhexlify
 from time import strftime, gmtime, sleep
+from os import fdopen, path
 
 def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
     res = b""
@@ -53,7 +54,7 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
                 if fname:
                     f = open(fname, "wb")
                 else:
-                    f = stdout
+                    f = fdopen(stdout.fileno(), 'wb') # binary stdout
 # if additional skip, do it
             while skip > 0:
                 img = s.recv(min(skip, 4096))
@@ -67,10 +68,7 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
             while size > 0:
                 img = s.recv(min(size, 4096))
                 if fname != None:
-                    if f == stdout:
-                        f.buffer.write(img)
-                    else:
-                        f.write(img)
+                    f.write(img)
                 else:
                     res += img
                 size -= len(img)
@@ -91,44 +89,43 @@ def read_data(cmd_txt, parm,  server_addr, fname, skip, get):
 def print_dir(d, recurse, server_addr):
     s = read_data("INNERFILE", d, server_addr, None, 0, 0)
     if s:
+        s = s.decode() # mostly text
         pos = 0
         while pos < len(s):
 # entry type
-            if s[pos] == 1 and recurse: # recurse into dir?
+            if s[pos] == '\x01' and recurse: # recurse into dir?
                 print_entry(d, s, pos)  # first print the entry itself
-                newdir = "" # collect name
                 pos += 17
-                while s[pos] != ord('|'):
-                    newdir += chr(s[pos])
+                start = pos
+                while pos < len(s) and s[pos] != '|':
                     pos += 1
+                if pos > start:
+                    print_dir(d + "/" + s[start:pos], True, server_addr)
                 pos += 1
-                if newdir:
-                    print_dir(d + "/" + newdir, True, server_addr)
             else:   # print file entry
                 pos = print_entry(d, s, pos)
 
 # print a directory entry at pos
 def print_entry(d, s, pos):
 # directory/file flag in the first byte
-    if s[pos] == 1:
-        print ("d ", end="")
+    if s[pos] == '\x01':
+        stdout.write ("d ")
     else:
-        print ("- ", end="")
+        stdout.write ("- ")
     pos += 1
 # file size in the next 8 bytes
-    size = unpack(">l", unhexlify(s[pos:pos+8]))[0]
-    print ("%9d " % size, end="")
+    size, = unpack(">l", unhexlify(s[pos:pos+8]))
+    stdout.write ("%9d " % size)
     pos += 8
 # date in the next 8 bytes
-    ftime = unpack(">l", unhexlify(s[pos:pos+8]))[0]
-    print (strftime("%Y-%m-%d %H:%M:%S ", gmtime(ftime)), end="")
+    ftime, = unpack(">l", unhexlify(s[pos:pos+8]))
+    stdout.write (strftime("%Y-%m-%d %H:%M:%S ", gmtime(ftime)))
     pos += 8
 # path + name in the following bytes, terminated by the char '|'
-    print (d + "/", end="")
-    while s[pos] != ord('|'):
-        print (chr(s[pos]), end="")
+    start = pos
+    while pos < len(s) and s[pos] != '|':
         pos += 1
-    print("");
+    print(d + "/" + s[start:pos])
     return pos + 1
 
 def usage(msg):
@@ -144,7 +141,8 @@ action:
       dir shows the content of the devices file storage. If the option 
           -a is given, the files on an USB drive a displayed as well
       if action starts with the letter /, a file is read from the devices file storage.
-          The full path name as shown with the command dir must be supplied. 
+          The full path name as shown with the command dir must be supplied as source.
+          If the target name is a directory, the file is stored there. 
 Options:
    -a show all files includes those on attached USB drives
    -s # : skip the first # bytes of the data from the device
@@ -213,11 +211,13 @@ def main():
             fname = ""
         else: 
             fname = "/D"
-        print("\nDirectory of Files:");
+        print ("\nDirectory of Files:")
         print_dir(fname, True, (ipaddr, port))
         print("")
     elif dtype == 'FILE': 
 # read file from scope. In that case, there must be at least one, and may be a second filename given
+        if path.isdir(target):
+            target = path.join(target, path.basename(fname))
         read_data("INNERFILE", fname, (ipaddr, port), target, 0, 0)
     else:
         stderr.write ("Wrong action requested: %s\n" % args[0])

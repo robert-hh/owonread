@@ -3,14 +3,14 @@
 
 **Description**
 
-This is small Python3 script for reading the screen image, binary images, the 
+This is small Python script for reading the screen image, binary images, the 
 full track data and files from an OWON TDS-Model oscilloscope using LAN. 
 The preferred habitat is Linux, but it works as well on OS X and Windows, 
-with the usual piping problems in Windows.
+with the usual piping problems in Windows. It works with both Python2 and Python3.
 
 **Usage**
 ```
-python3 owonread.py [OPTIONS] action [target]
+python owonread.py [OPTIONS] action [target]
 
 action:
     data type to read, as of: bmp jpg png ch1 ch2 ch3 ch4 screen dir file_name
@@ -20,7 +20,9 @@ action:
       dir shows the content of the devices file storage. If the option 
           -a is given, the files on an USB drive are displayed as well
       if action starts with the letter /, a file is read from the devices file storage.
-          The full path name as shown with the command dir must be supplied. 
+          The full path name as shown with the command dir must be supplied as source. 
+          If the target is a directory, the file is stored in that directory, taking the
+          source basename as the target file name
 Options:
    -a show all files includes those on attached USB drives
    -s # : skip the first # bytes of the data from the device
@@ -37,31 +39,34 @@ The script contains a shebang line, so you can start it without typing python3 u
 
 **Examples:**
 
-`python3 owonread.py bmp image001.bmp`<br>
+`python owonread.py bmp image001.bmp`<br>
     *get a screen shot as BMP file and store it into image001.bmp*
 
-`python3 owonread.py jpg image002.jpg`<br>
+`python owonread.py jpg image002.jpg`<br>
     *get a screen shot as jpg file and store it into image002.jpg*
 
-`python3 owonread.py ch1 fulldata_ch1.bin`<br>
+`python owonread.py ch1 fulldata_ch1.bin`<br>
     *get the full content of CH1 data buffer*
 
-`python3 owonread.py -s 78 ch3 rawdata.bin`<br>
+`python owonread.py -s 78 ch3 rawdata.bin`<br>
     *get the full content of CH3 track buffer, skipping the first 78 bytes with header information*
     
-`python3 owonread.py dir`<br>
+`python owonread.py dir`<br>
     *Show the list of files stored in the data section of the oscilloscope* 
 
-`python3 owonread.py -a dir`<br>
+`python owonread.py -a dir`<br>
     *Show the list of files stored in the data section of the oscilloscope and on an attached USB drive* 
 
-`python3 owonread.py screen`<br>
+`python owonread.py screen`<br>
     *get the traces of all channels as shown on the screen, including the math trace* 
 
-`python3 owonread.py /D/owon00001.csv pulse_response.csv`<br>
+`python owonread.py /D/owon00001.csv pulse_response.csv`<br>
     *read the file /D/owon0001.csv from the device and store it as pulse_response.csv*
 
-`python3 owonread.py | display`<br>
+`python owonread.py /D/owon00001.csv .`<br>
+    *read the file /D/owon0001.csv from the device and store it as owon0001.csv in the current path*
+
+`python owonread.py | display`<br>
     *get a screen shot and pipe it into the Linux display command*
             
 **Notes**
